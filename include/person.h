@@ -5,8 +5,8 @@
 
 typedef struct {
     int id;
-    const char *first_name;
-    const char *last_name;
+    char first_name[50];
+    char last_name[50];
     int age;
 } person_t;
 
@@ -26,7 +26,7 @@ static int database_execute(database_t *database, const char *sql);
 static void database_create(database_t *database);
 static void database_populate(database_t *database);
 static person_t *database_fetchone_by_id(database_t *database, int id);
-static person_t **database_fetchall(database_t *database);
+static person_t *database_fetchall(database_t *database);
 static int database_update(database_t *database, person_t *person);
 static int database_delete_by_id(database_t *database, int id);
 static void database_close(database_t *database);
@@ -61,8 +61,8 @@ static void database_create(database_t *database)
 
     sql = "CREATE TABLE IF NOT EXISTS person " \
           "(id INTEGER NOT NULL PRIMARY KEY ASC," \
-          "first_name TEXT NOT NULL," \
-          "last_name TEXT NOT NULL," \
+          "first_name TEXT(50) NOT NULL," \
+          "last_name TEXT(50) NOT NULL," \
           "age INTEGER NOT NULL);";           
     database_execute(database, sql);        
 }
@@ -99,7 +99,6 @@ static int database_execute(database_t *database, const char *sql)
 
 static person_t *database_fetchone_by_id(database_t *database, int id)
 {
-    // for a select with id max value of int (-)9999999999 size equal 39
     char *sql = malloc(64);
 
     sprintf(sql, "SELECT * FROM person WHERE id=%d;", id);
@@ -112,8 +111,8 @@ static person_t *database_fetchone_by_id(database_t *database, int id)
         person = calloc(1, sizeof(person_t));
 
         person->id = sqlite3_column_int(database->res, 0);
-        person->first_name = sqlite3_column_text(database->res, 1);
-        person->last_name = sqlite3_column_text(database->res, 2);
+        strcpy(person->first_name, sqlite3_column_text(database->res, 1));
+        strcpy(person->last_name, sqlite3_column_text(database->res, 2));
         person->age = sqlite3_column_int(database->res, 3);
         free(sql);
         return person;
@@ -123,7 +122,7 @@ static person_t *database_fetchone_by_id(database_t *database, int id)
 }
 
 
-static person_t **database_fetchall(database_t *database)
+static person_t *database_fetchall(database_t *database)
 {
     char *sql;
 
@@ -131,16 +130,16 @@ static person_t **database_fetchall(database_t *database)
     database_execute(database, sql);   
 
     int index = 0;
-    person_t **person = NULL;
+    person_t *person = NULL;
 
     while (sqlite3_step(database->res) != SQLITE_DONE) {
   
         person = realloc(person, (index + 1) * sizeof(person_t));    
 
-        *(person[index])->id = sqlite3_column_int(database->res, 0);
-        *(person[index])->first_name  = sqlite3_column_text(database->res, 1);
-        *(person[index])->last_name = sqlite3_column_text(database->res, 2);
-        *(person[index])->age = sqlite3_column_int(database->res, 3);
+        person[index].id = sqlite3_column_int(database->res, 0);
+        strcpy(person[index].first_name, sqlite3_column_text(database->res, 1));
+        strcpy(person[index].last_name, sqlite3_column_text(database->res, 2));
+        person[index].age = sqlite3_column_int(database->res, 3);
 
         index++;
     }
@@ -153,7 +152,6 @@ static person_t **database_fetchall(database_t *database)
 
 static int database_update(database_t *database, person_t *person)
 {
-    // for a update with id max value of int (-)9999999999 size equal 137
     char *sql = malloc(256);
 
     sprintf(sql, "UPDATE person SET " \
@@ -179,7 +177,6 @@ static int database_update(database_t *database, person_t *person)
 
 static int database_delete_by_id(database_t *database, int id)
 {
-    // for a delete with id max value of int (-)9999999999 size equal 39
     char *sql = malloc(64);
 
     sprintf(sql, "DELETE FROM person WHERE id=%d;", id);

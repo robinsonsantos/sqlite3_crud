@@ -10,8 +10,8 @@ int main(int argc, char **argv)
     database_t *database;
 
     person_t *person = NULL;
-    person_t **personList = NULL;
-  
+    person_t *personList = NULL;
+
     database = sqlite3_connect(DATABASE);
 
     database_create(database);
@@ -19,7 +19,7 @@ int main(int argc, char **argv)
 
     person = database_fetchone_by_id(database, 1);
 
-   if (person != NULL) {
+    if (person != NULL) {
         printf("#################### fetch by id\n");
         printf("person id: %d\n", person->id);
         printf("person first_name: %s\n", person->first_name);
@@ -29,32 +29,31 @@ int main(int argc, char **argv)
         printf("Register not found\n");
     }
 
-  database_fetchall(database);
-  
- /*for (int i=0; i < database->rowCount; i++) {
-        printf("#################### fetch all\n");
-        printf("person id: %d\n", personList[i]->id);
-        printf("person first_name: %s\n", personList[i]->first_name);
-        printf("person last_name: %s\n", personList[i]->last_name);
-        printf("person age: %d\n", personList[i]->age);
-  }
+    personList = database_fetchall(database);
 
-/*    printf("#################### fetch by id\n");
+    for (int i=0; i < database->rowCount; i++) {
+        printf("#################### fetch all\n");
+        printf("person id: %d\n", personList[i].id);
+        printf("person first_name: %s\n", personList[i].first_name);
+        printf("person last_name: %s\n", personList[i].last_name);
+        printf("person age: %d\n", personList[i].age);
+    }
+
+    printf("#################### fetch by id\n");
     printf("person id: %d\n", person->id);
     printf("person first_name: %s\n", person->first_name);
     printf("person last_name: %s\n", person->last_name);
-    printf("person age: %d\n", person->age);*/
+    printf("person age: %d\n", person->age);
     
-    //printf("last_name1 %s", person->last_name);
-    //person->last_name = "gen";
-    //printf("last_name2 %s", person->last_name);
-/*    if (database_update(database, person)){
+    strcpy(person->first_name, "mary");
+    strcpy(person->last_name, "jane watson");
+    if (database_update(database, person)){
         printf("update was successfully\n");
     } else {
         printf("something wrong in update function\n");
-    }*/
+    }
 
-/*    person = database_fetchone_by_id(database, 1, person);
+    person = database_fetchone_by_id(database, 1);
 
     if (person != NULL) {
         printf("#################### fetch by id\n");
@@ -72,13 +71,14 @@ int main(int argc, char **argv)
         printf("something wrong in delete function\n");
     }
 
-    if (database_fetchone_by_id(database, 1, person) != NULL) {
+    if (database_fetchone_by_id(database, 1) != NULL) {
     printf("Register found\n");
     } else {
         printf("Register not found\n");
-    } */
+    }
 
     free(person);
+    free(personList);
     database_close(database);
         
     return 0;
