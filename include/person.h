@@ -30,6 +30,7 @@ static person_t *database_fetchall(database_t *database);
 static int database_update(database_t *database, person_t *person);
 static int database_delete_by_id(database_t *database, int id);
 static void database_close(database_t *database);
+static void database_set_row_count(database_t *database);
 
 
 static database_t *sqlite3_connect(const char *filename)
@@ -74,7 +75,12 @@ static void database_populate(database_t *database)
 
     sql = "INSERT OR IGNORE INTO person VALUES (" \
           "1, 'john', 'armless', 30);";  
+
     database_execute(database, sql);
+    sql = "INSERT OR IGNORE INTO person VALUES (" \
+          "2, 'jorge', 'vargas', 40);";  
+    database_execute(database, sql);
+
 }
 
 
@@ -129,26 +135,38 @@ static person_t *database_fetchall(database_t *database)
     sql = "SELECT * FROM person;";
     database_execute(database, sql);   
 
-    int index = 0;
-    person_t *person = NULL;
+    database_set_row_count(database);
 
-    while (sqlite3_step(database->res) != SQLITE_DONE) {
+    person_t *person = malloc (database->rowCount * sizeof(person_t));
+
+    while (sqlite3_step(database->res) != SQLITE_DONE) 
+    {
   
-        person = realloc(person, (index + 1) * sizeof(person_t));    
+        (person)->id = sqlite3_column_int(database->res, 0);
+        strcpy((person)->first_name, sqlite3_column_text(database->res, 1));
+        strcpy((person)->last_name, sqlite3_column_text(database->res, 2));
+        (person)->age = sqlite3_column_int(database->res, 3);
 
-        person[index].id = sqlite3_column_int(database->res, 0);
-        strcpy(person[index].first_name, sqlite3_column_text(database->res, 1));
-        strcpy(person[index].last_name, sqlite3_column_text(database->res, 2));
-        person[index].age = sqlite3_column_int(database->res, 3);
-
-        index++;
+	person++;
     }
 
-    database->rowCount = index;
+  
 
-    return person;
+    return person - (database->rowCount );
 }
 
+static void database_set_row_count(database_t *database)
+{
+    
+    sqlite3_reset(database->res); 
+    database->rowCount = 0;
+    while (sqlite3_step(database->res) != SQLITE_DONE) 
+    {
+      database->rowCount++;
+    }
+
+    sqlite3_reset(database->res); 
+}
 
 static int database_update(database_t *database, person_t *person)
 {
