@@ -10,7 +10,7 @@ int main(int argc, char **argv)
     database_t *database;
 
     person_t *person = NULL;
-    person_t *personList = NULL;
+    person_t *personList =  NULL ;
 
     database = sqlite3_connect(DATABASE);
 
@@ -31,12 +31,18 @@ int main(int argc, char **argv)
 
     personList = database_fetchall(database);
 
-    for (int i=0; i < database->rowCount; i++) {
+    printf("\n - trbc - teste >>>  %d \n",  database->rowCount)	;
+
+    for (int i=0; i < database->rowCount ; i++) {
         printf("#################### fetch all\n");
-        printf("person id: %d\n", personList[i].id);
-        printf("person first_name: %s\n", personList[i].first_name);
-        printf("person last_name: %s\n", personList[i].last_name);
-        printf("person age: %d\n", personList[i].age);
+        printf("person id: %d\n", personList->id);
+        printf("person first_name: %s\n", personList->first_name);
+        printf("person last_name: %s\n", personList->last_name);
+        printf("person age: %d\n", personList->age);
+
+	personList++;
+
+
     }
 
     printf("#################### fetch by id\n");
@@ -78,7 +84,7 @@ int main(int argc, char **argv)
     }
 
     free(person);
-    free(personList);
+//    free(personList);
     database_close(database);
         
     return 0;
