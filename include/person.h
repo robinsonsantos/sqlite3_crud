@@ -151,7 +151,7 @@ static person_t *database_fetchall(database_t *database)
 
   
 
-    return person - (database->rowCount );
+    return person - (database->rowCount);
 }
 
 static void database_set_row_count(database_t *database)
