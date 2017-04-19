@@ -117,8 +117,8 @@ static person_t *database_fetchone_by_id(database_t *database, int id)
         person = calloc(1, sizeof(person_t));
 
         person->id = sqlite3_column_int(database->res, 0);
-        strcpy(person->first_name, sqlite3_column_text(database->res, 1));
-        strcpy(person->last_name, sqlite3_column_text(database->res, 2));
+        strcpy(person->first_name, (const char *restrict) sqlite3_column_text(database->res, 1));
+        strcpy(person->last_name, (const char *restrict) sqlite3_column_text(database->res, 2));
         person->age = sqlite3_column_int(database->res, 3);
         free(sql);
         return person;
@@ -137,15 +137,14 @@ static person_t *database_fetchall(database_t *database)
 
     database_set_row_count(database);
 
-    person_t *person = malloc (database->rowCount * sizeof(person_t));
+    person_t *person = malloc(database->rowCount * sizeof(person_t));
 
     while (sqlite3_step(database->res) != SQLITE_DONE) 
-    {
-  
-        (person)->id = sqlite3_column_int(database->res, 0);
-        strcpy((person)->first_name, sqlite3_column_text(database->res, 1));
-        strcpy((person)->last_name, sqlite3_column_text(database->res, 2));
-        (person)->age = sqlite3_column_int(database->res, 3);
+    {  
+        person->id = sqlite3_column_int(database->res, 0);
+        strcpy(person->first_name, (const char *restrict) sqlite3_column_text(database->res, 1));
+        strcpy(person->last_name, (const char *restrict) sqlite3_column_text(database->res, 2));
+        person->age = sqlite3_column_int(database->res, 3);
 
 	person++;
     }
