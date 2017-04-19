@@ -17,7 +17,7 @@ static void database_set_row_count(database_t *database);
 
 # how to compile
 ```
-user@computer:~/person$ gcc -o person person.c -lsqlite3
+user@computer:~/person$ gcc -o person person.c -Wall -lsqlite3
 ```
 
 # how to use
