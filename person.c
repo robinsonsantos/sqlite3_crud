@@ -40,10 +40,13 @@ int main(int argc, char **argv)
         printf("person last_name: %s\n", personList->last_name);
         printf("person age: %d\n", personList->age);
 
-	personList++;
-
+        personList++;
+ 
 
     }
+    // reseta o cursor do ponteiro
+    personList	= personList - (database->rowCount );
+
 
     printf("#################### fetch by id\n");
     printf("person id: %d\n", person->id);
@@ -84,7 +87,7 @@ int main(int argc, char **argv)
     }
 
     free(person);
-//    free(personList);
+    free(personList);
     database_close(database);
         
     return 0;
